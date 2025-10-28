@@ -22,6 +22,9 @@ motor motorLeft = motor(PORT9, false);
 // RIGHT MOTOR PORT 10
 motor motorRight = motor(PORT10, true);
 
+// LIFT MOTOR 1 ON PORT 11
+motor motorLift = motor(PORT11, reverse);
+
 
 void turnToPosition(double direction, double angle)
 {
@@ -31,6 +34,8 @@ void turnToPosition(double direction, double angle)
         while (abs(motorLeft.position(degrees)) < angle){
             motorRight.spin(reverse);
             motorLeft.spin(forward);}
+        motorRight.stop();
+        motorLeft.stop();
     }
     if (direction == 0){
         motorLeft.setPosition(0, degrees);
@@ -45,6 +50,16 @@ void moveForward(double time, double colour)
     motorLeft.spin(forward);
     motorRight.spin(forward);
 }
+
+void lift(double direction){
+    if (direction == 1){
+        motorLift.spin(forward);
+    }
+    if (direction == 0){
+        motorLift.spin(reverse);
+    }
+}
+
 int main() {
 	
     Brain.Screen.printAt( 2, 30, "Hello IQ2" );
