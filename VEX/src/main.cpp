@@ -1,19 +1,21 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Author:       micahlam                                                  */
+/*    Authors:       Micah, Lakindu, Aidan, Gerry                             */
 /*    Created:      10/28/2025, 3:53:22 PM                                    */
 /*    Description:  IQ2 project                                               */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 #include "vex.h"
-
+#include "iq_cpp.h"
 using namespace vex;
 
 // A global instance of vex::brain used for printing to the IQ2 brain screen
 vex::brain       Brain;
 
 // define your global instances of motors and other devices here
+
+
 
 
 int main() {
