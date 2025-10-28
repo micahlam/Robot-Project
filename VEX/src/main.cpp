@@ -23,7 +23,7 @@ motor motorLeft = motor(PORT9, false);
 motor motorRight = motor(PORT10, true);
 
 // LIFT MOTOR 1 ON PORT 11
-motor motorLift = motor(PORT11, reverse);
+motor motorLift = motor(PORT11, false);
 
 
 void turnToPosition(double direction, double angle)
@@ -32,26 +32,31 @@ void turnToPosition(double direction, double angle)
     if (direction == 1){
         motorLeft.setPosition(0, degrees);
         while (abs(motorLeft.position(degrees)) < angle){
-            motorRight.spin(reverse);
-            motorLeft.spin(forward);}
+            motorRight.spin(reverse, 50, percent);
+            motorLeft.spin(forward, 50, percent);}
         motorRight.stop();
         motorLeft.stop();
     }
     if (direction == 0){
         motorLeft.setPosition(0, degrees);
         while (abs(motorLeft.position(degrees)) < angle){
-            motorRight.spin(forward);
-            motorLeft.spin(reverse);}
+            motorRight.spin(forward, 50, percent);
+            motorLeft.spin(reverse, 50, percent);}
+        motorRight.stop();
+        motorLeft.stop();
     }
 }
 
+// NOT COMPLETE
 void moveForward(double time, double colour)
 {
     motorLeft.spin(forward);
     motorRight.spin(forward);
 }
 
-void lift(double direction){
+// NOT COMPLETE
+void lift(double direction, double position){
+    // 1 is up, 0 is down
     if (direction == 1){
         motorLift.spin(forward);
     }
@@ -62,7 +67,7 @@ void lift(double direction){
 
 int main() {
 	
-    Brain.Screen.printAt( 2, 30, "Hello IQ2" );
+    Brain.Screen.printAt( 2, 30, "HAHA VEX PROJECT" );
    
     while(1) {
         
