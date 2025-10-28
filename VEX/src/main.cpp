@@ -27,9 +27,16 @@ void turnToPosition(double direction, double angle)
 {
     // 1 is right, 0 is left
     if (direction == 1){
-        motorLeft.spinToPosition(angle,degrees);
-        motorRight.spin(reverse);
-        motorLeft.spin(forward);
+        motorLeft.setPosition(0, degrees);
+        while (abs(motorLeft.position(degrees)) < angle){
+            motorRight.spin(reverse);
+            motorLeft.spin(forward);}
+    }
+    if (direction == 0){
+        motorLeft.setPosition(0, degrees);
+        while (abs(motorLeft.position(degrees)) < angle){
+            motorRight.spin(forward);
+            motorLeft.spin(reverse);}
     }
 }
 
