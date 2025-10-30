@@ -12,7 +12,7 @@ using namespace vex;
 
 // A global instance of vex::brain used for printing to the IQ2 brain screen
 vex::brain       Brain;
-
+vex::controller  Controller;
 // define your global instances of motors and other devices here
 
 // MOTOR PORTS
@@ -23,7 +23,7 @@ motor motorLeft = motor(PORT9, false);
 motor motorRight = motor(PORT10, true);
 
 // LIFT MOTOR 1 ON PORT 11
-motor motorLift = motor(PORT11, false);
+motor motorLift = motor(PORT6, false);
 
 
 void turnToPosition(double direction, double angle)
@@ -55,23 +55,37 @@ void moveForward(double time, double colour)
 }
 
 // NOT COMPLETE
-void lift(double direction, double position){
-    // 1 is up, 0 is down
-    if (direction == 1){
+void lift(int direction, double position){
+    // 0 is up, 1 is down
+    motorLift.setPosition(0, degrees);
+    
+
+    
+
+
+    if (direction == 1)
+    {
         motorLift.spin(forward);
+        motorLift.spinToPosition(position, degrees);
+        
     }
-    if (direction == 0){
+    
+    if (direction == 0)
+    {
         motorLift.spin(reverse);
+        motorLift.spinToPosition(position, degrees);
     }
 }
 
 int main() {
 	
     Brain.Screen.printAt( 2, 30, "HAHA VEX PROJECT" );
-   
-    while(1) {
-        
-        // Allow other tasks to run
-        this_thread::sleep_for(10);
-    }
+    while(true){
+        if (Controller.ButtonLUp.pressing()) {
+            lift(0,180);
+        }
+        if (Controller.ButtonLDown.pressing()){
+            lift(1,0);
+        }}
+
 }
