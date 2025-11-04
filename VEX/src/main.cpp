@@ -22,8 +22,11 @@ motor motorLeft = motor(PORT9, false);
 // RIGHT MOTOR PORT 10
 motor motorRight = motor(PORT10, true);
 
-// LIFT MOTOR 1 ON PORT 11
-motor motorLift = motor(PORT6, false);
+// LIFT MOTOR ON PORT 7
+motor motorLift = motor(PORT7, false);
+
+// CLAW MOTOR ON PORT 8
+motor clawLift = motor(PORT8, true);
 
 
 void turnToPosition(double direction, double angle)
@@ -54,15 +57,10 @@ void moveForward(double time, double colour)
     motorRight.spin(forward);
 }
 
-// NOT COMPLETE
 void lift(int direction, double position){
     // 0 is up, 1 is down
     motorLift.setPosition(0, degrees);
     
-
-    
-
-
     if (direction == 1)
     {
         motorLift.spin(forward);
@@ -75,6 +73,18 @@ void lift(int direction, double position){
     }
 }
 
+void claw(int direction)
+{
+    if (direction == 1)
+    {
+        motorLift.spin(forward);
+    }
+    if (direction == 0)
+    {
+        motorLift.spin(reverse);}
+}
+
+
 int main() {
 	
     Brain.Screen.printAt( 2, 30, "HAHA VEX PROJECT" );
@@ -85,5 +95,11 @@ int main() {
         if (Controller.ButtonLDown.pressing()){
             lift(1,0);
         }}
+        if (Controller.ButtonRUp.pressing()){
+            claw(1);
+        if (Controller.ButtonRDown.pressing()){
+            claw(0);
+        }
+        }
 
 }
