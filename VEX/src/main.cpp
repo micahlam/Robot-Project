@@ -67,9 +67,7 @@ void lift(int direction, double position){
     {
         motorLift.spin(forward);
         motorLift.spinToPosition(position, degrees);
-        
     }
-    
     if (direction == 0)
     {
         motorLift.spin(reverse);
