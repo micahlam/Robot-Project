@@ -84,6 +84,16 @@ void claw(int direction)
         motorLift.spin(reverse);}
 }
 
+void colour()
+{
+    // if sense colour blue 
+}
+
+void senseobject()
+{
+    // sense if there is a cube inside slot
+}
+
 
 int main() {
 	
