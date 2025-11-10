@@ -1,114 +1,174 @@
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
-/*    Authors:       Micah, Lakindu, Aidan, Gerry                             */
+/*    Authors:      Micah, Lakindu, Aidan, Gerry                              */
 /*    Created:      10/28/2025, 3:53:22 PM                                    */
-/*    Description:  IQ2 project                                               */
+/*    Description:  IQ2 project — Line follow, pick cube, deliver to slot     */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 #include "vex.h"
 #include "iq_cpp.h"
 using namespace vex;
 
-// A global instance of vex::brain used for printing to the IQ2 brain screen
+// Global instances
 vex::brain       Brain;
 vex::controller  Controller;
-// define your global instances of motors and other devices here
 
 // MOTOR PORTS
-// LEFT MOTOR PORT 9
-motor motorLeft = motor(PORT9, false);
+motor motorLeft = motor(PORT9, false);   // Left drive
+motor motorRight = motor(PORT10, true);  // Right drive
+motor motorLift = motor(PORT7, false);   // Lift
+motor clawLift = motor(PORT8, true);     // Claw
 
-// RIGHT MOTOR PORT 10
-motor motorRight = motor(PORT10, true);
+// SENSORS (add these to your robot config)
+color colorSensor = color(PORT3);        // Line follower color sensor
+distance distanceSensor = distance(PORT4); // Detect cube/slot box
 
-// LIFT MOTOR ON PORT 7
-motor motorLift = motor(PORT7, false);
-
-// CLAW MOTOR ON PORT 8
-motor clawLift = motor(PORT8, true);
-
+//----------------------------------------------//
+//          BASIC MOVEMENT FUNCTIONS            //
+//----------------------------------------------//
+void moveForward(double timeSec, double speed = 50)
+{
+    motorLeft.spin(forward, speed, percent);
+    motorRight.spin(forward, speed, percent);
+    wait(timeSec, seconds);
+    motorLeft.stop();
+    motorRight.stop();
+}
 
 void turnToPosition(double direction, double angle)
 {
-    // 1 is right, 0 is left
-    if (direction == 1){
-        motorLeft.setPosition(0, degrees);
-        while (abs(motorLeft.position(degrees)) < angle){
-            motorRight.spin(reverse, 50, percent);
-            motorLeft.spin(forward, 50, percent);}
-        motorRight.stop();
-        motorLeft.stop();
+    // direction: 1 = right, 0 = left
+    motorLeft.setPosition(0, degrees);
+    double speed = 40;
+
+    if (direction == 1) { // Turn right
+        while (fabs(motorLeft.position(degrees)) < angle) {
+            motorRight.spin(reverse, speed, percent);
+            motorLeft.spin(forward, speed, percent);
+        }
+    } 
+    else if (direction == 0) { // Turn left
+        while (fabs(motorLeft.position(degrees)) < angle) {
+            motorRight.spin(forward, speed, percent);
+            motorLeft.spin(reverse, speed, percent);
+        }
     }
-    if (direction == 0){
-        motorLeft.setPosition(0, degrees);
-        while (abs(motorLeft.position(degrees)) < angle){
-            motorRight.spin(forward, 50, percent);
-            motorLeft.spin(reverse, 50, percent);}
-        motorRight.stop();
-        motorLeft.stop();
-    }
+
+    motorRight.stop();
+    motorLeft.stop();
 }
 
-// NOT COMPLETE
-void moveForward(double time, double colour)
+//----------------------------------------------//
+//              ARM + CLAW CONTROL               //
+//----------------------------------------------//
+void lift(int direction, double position)
 {
-    motorLeft.spin(forward);
-    motorRight.spin(forward);
-}
-
-void lift(int direction, double position){
-    // 0 is up, 1 is down
+    // direction: 0 = up, 1 = down
     motorLift.setPosition(0, degrees);
-    
-    if (direction == 1)
-    {
-        motorLift.spin(forward);
-        motorLift.spinToPosition(position, degrees);
-    }
-    if (direction == 0)
-    {
-        motorLift.spin(reverse);
-        motorLift.spinToPosition(position, degrees);
+
+    if (direction == 0) { // Up
+        motorLift.spinToPosition(position, degrees, 50, percent);
+    } 
+    else if (direction == 1) { // Down
+        motorLift.spinToPosition(-position, degrees, 50, percent);
     }
 }
 
 void claw(int direction)
 {
-    if (direction == 1)
-    {
-        motorLift.spin(forward);
+    // direction: 1 = close, 0 = open
+    if (direction == 1) {
+        clawLift.spin(forward, 50, percent);
+        wait(0.5, seconds);
+        clawLift.stop();
+    } 
+    else if (direction == 0) {
+        clawLift.spin(reverse, 50, percent);
+        wait(0.5, seconds);
+        clawLift.stop();
     }
-    if (direction == 0)
-    {
-        motorLift.spin(reverse);}
 }
 
-void colour()
+//----------------------------------------------//
+//           SENSOR-ACTION FUNCTIONS             //
+//----------------------------------------------//
+bool colourDetected(string targetColour)
 {
-    // if sense colour blue 
+    color hue = colorSensor.color();
+    if (targetColour == "blue" && hue == color::blue) return true;
+    if (targetColour == "red" && hue == color::red) return true;
+    return false;
 }
 
-void senseobject()
+bool senseobject()
 {
-    // sense if there is a cube inside slot
+    // Returns true if something is close (< 10cm)
+    return distanceSensor.objectDistance(mm) < 100;
 }
 
+//----------------------------------------------//
+//            MAIN AUTONOMOUS LOGIC              //
+//----------------------------------------------//
+void autonomousRoutine()
+{
+    Brain.Screen.printAt(2, 30, "Running Autonomous Routine");
 
+    // STEP 1: Follow line until cube is detected
+    while (!senseobject()) {
+        // Basic line follow — simple P logic (left/right adjust)
+        if (colourDetected("blue")) {
+            motorLeft.spin(forward, 30, percent);
+            motorRight.spin(forward, 20, percent);
+        } else {
+            motorLeft.spin(forward, 20, percent);
+            motorRight.spin(forward, 30, percent);
+        }
+        wait(20, msec);
+    }
+
+    // STEP 2: Pick up cube from left side
+    motorLeft.stop();
+    motorRight.stop();
+    turnToPosition(0, 45);     // Turn slightly left
+    claw(0);                   // Open claw
+    moveForward(0.5);          // Move to cube
+    claw(1);                   // Close claw to grab
+    lift(0, 180);              // Lift cube up
+
+    // STEP 3: Move to end of arena
+    moveForward(3.0);          // Adjust timing to fit your arena
+
+    // STEP 4: Turn left, go straight, turn right
+    turnToPosition(0, 90);     // Left turn
+    moveForward(1.0);
+    turnToPosition(1, 90);     // Right turn
+
+    // STEP 5: Check if slot has box
+    if (senseobject()) {
+        // If occupied, move one slot down
+        moveForward(0.5);
+    }
+
+    // STEP 6: Place cube
+    lift(1, 180);              // Lower lift
+    claw(0);                   // Open claw to drop
+    wait(1, seconds);
+
+    // STEP 7: Return to start
+    moveForward(-1.0);         // Back out
+    turnToPosition(1, 180);    // Turn around
+    moveForward(3.0);          // Drive back to start
+
+    Brain.Screen.printAt(2, 60, "Routine Complete");
+}
+
+//----------------------------------------------//
+//                   MAIN                       //
+//----------------------------------------------//
 int main() {
-	
-    Brain.Screen.printAt( 2, 30, "group 23 robot project" );
-    while(true){
-        if (Controller.ButtonLUp.pressing()) {
-            lift(0,180);
-        }
-        if (Controller.ButtonLDown.pressing()){
-            lift(1,0);
-        }}
-        if (Controller.ButtonRUp.pressing()){
-            claw(1);
-        if (Controller.ButtonRDown.pressing()){
-            claw(0);
-        }
-        }
+    Brain.Screen.printAt(2, 20, "Group 23 Robot Project - Autonomous");
+
+    wait(2, seconds); // small delay before starting
+    autonomousRoutine(); // Run the full sequence
 }
