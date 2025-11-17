@@ -7,7 +7,6 @@
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 #include "vex.h"
-#include "iq_cpp.h"
 using namespace vex;
 
 // A global instance of vex::brain used for printing to the IQ2 brain screen
@@ -77,11 +76,12 @@ void claw(int direction)
 {
     if (direction == 1)
     {
-        motorLift.spin(forward);
+        clawLift.spin(forward);
     }
-    if (direction == 0)
+    else
     {
-        motorLift.spin(reverse);}
+        clawLift.spin(reverse);
+    }
 }
 
 void colour()
@@ -104,11 +104,15 @@ int main() {
         }
         if (Controller.ButtonLDown.pressing()){
             lift(1,0);
-        }}
+        }
+
         if (Controller.ButtonRUp.pressing()){
             claw(1);
+        }
         if (Controller.ButtonRDown.pressing()){
             claw(0);
         }
-        }
+
+        vex::this_thread::sleep_for(20);
+    }
 }
