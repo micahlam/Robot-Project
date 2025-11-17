@@ -28,6 +28,8 @@ motor motorLift = motor(PORT7, false);
 // CLAW MOTOR ON PORT 8
 motor clawLift = motor(PORT8, true);
 
+// SENSORS
+
 
 void turnToPosition(double direction, double angle)
 {
@@ -87,6 +89,14 @@ void claw(int direction)
 void colour()
 {
     // if sense colour blue 
+    motorRight.spin(forward);
+    motorLeft.spin(forward);
+    while{
+        sensor
+    }
+
+
+
 }
 
 void senseobject()
