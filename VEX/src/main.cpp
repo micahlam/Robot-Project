@@ -107,7 +107,7 @@ void senseobject()
 
 int main() {
 	
-    Brain.Screen.printAt( 2, 30, "HAHA VEX PROJECT" );
+    Brain.Screen.printAt( 2, 30, "group 23 robot project" );
     while(true){
         if (Controller.ButtonLUp.pressing()) {
             lift(0,180);
