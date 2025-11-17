@@ -1,19 +1,19 @@
 {
-	"extension": {
-		"version": "0.7.2025041600",
-		"json": 2
-	},
-	"project": {
-		"name": "VEX",
-		"description": "",
-		"creationDate": "10/28/2025, 3:53:22 PM",
-		"platform": "IQ2",
-		"language": "cpp",
-		"slot": 1,
-		"sdkVersion": "IQ2_20250520_15_00_00",
-		"cpp": {
-			"includePath": [],
-			"printf_float": false
-		}
-	}
+    "extension": {
+        "version": "0.7.2025041600",
+        "json": 2
+    },
+    "project": {
+        "name": "VEX",
+        "description": "",
+        "creationDate": "10/28/2025, 3:53:22 PM",
+        "platform": "IQ2",
+        "language": "cpp",
+        "slot": 1,
+        "sdkVersion": "IQ2_20250520_15_00_00",
+        "cpp": {
+            "includePath": [],
+            "printf_float": false
+        }
+    }
 }
