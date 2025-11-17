@@ -1,65 +1,17 @@
 {
-	"env": {
-		"vex_compilerPath": "${config:vexrobotics.vexcode.Cpp.Toolchain.Path}/clang/bin/clang",
-		"vex_sdkPath": "${config:vexrobotics.vexcode.Cpp.Sdk.Home}/IQ2/IQ2_20250520_15_00_00/vexiq2",
-		"vex_gcc": "${env:vex_sdkPath}/gcc/include/c++/7.3.1",
-		"vex_sdkIncludes": [
-			"${env:vex_sdkPath}/clang/8.0.0/include/**",
-			"${env:vex_gcc}/**",
-			"${env:vex_gcc}/arm-none-eabi/thumb",
-			"${env:vex_sdkPath}/gcc/include",
-			"${env:vex_sdkPath}/include/**",
-			"${workspaceFolder}/include/**",
-			"${workspaceFolder}/src/**"
-		]
-	},
-	"configurations": [
-		{
-			"name": "VEX",
-			"includePath": [
-				"${workspaceFolder}/VEX/include",
-				"${env:vex_sdkPath}/clang/8.0.0/include",
-				"${env:vex_sdkPath}/include",
-				"${env:vex_sdkPath}/gcc/include",
-				"${env:vex_sdkPath}/gcc/include/c++/7.3.1",
-				"${env:vex_sdkPath}/gcc/include/c++/7.3.1/arm-none-eabi"
-			],
-			"defines": [ "VexIQ2" ],
-			"cStandard": "c11",
-			"cppStandard": "c++11",
-			"intelliSenseMode": "gcc-x64",
-			"compilerPath": "${env:vex_compilerPath}"
-		},
-		{
-			"name": "Win32",
-			"includePath": [
-				"${env:vex_sdkIncludes}"
-			],
-			"compilerPath": "${env:vex_compilerPath}",
-			"cStandard": "gnu99",
-			"cppStandard": "gnu++11",
-			"intelliSenseMode": "windows-clang-x86"
-		},
-		{
-			"name": "Mac",
-			"includePath": [
-				"${env:vex_sdkIncludes}"
-			],
-			"compilerPath": "${env:vex_compilerPath}",
-			"cStandard": "gnu99",
-			"cppStandard": "gnu++11",
-			"intelliSenseMode": "macos-clang-x86"
-		},
-		{
-			"name": "Linux",
-			"includePath": [
-				"${env:vex_sdkIncludes}"
-			],
-			"compilerPath": "${env:vex_compilerPath}",
-			"cStandard": "gnu99",
-			"cppStandard": "gnu++11",
-			"intelliSenseMode": "linux-clang-x86"
-		}
-	],
-	"version": 4
+  "configurations": [
+    {
+      "name": "VEX",
+      "includePath": [
+        "${workspaceFolder}/**"
+      ],
+      "defines": [
+        "VexIQ2"
+      ],
+      "cStandard": "c11",
+      "cppStandard": "c++11",
+      "intelliSenseMode": "gcc-x64"
+    }
+  ],
+  "version": 4
 }
