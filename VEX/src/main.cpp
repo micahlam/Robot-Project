@@ -28,7 +28,9 @@ motor motorLift = motor(PORT7, false);
 motor clawLift = motor(PORT8, true);
 
 // SENSORS
+distance distanceSensor(PORT4);
 
+optical colorSensor(PORT2);
 
 void turnToPosition(double direction, double angle)
 {
@@ -91,8 +93,8 @@ void colour()
     // if sense colour blue 
     motorRight.spin(forward);
     motorLeft.spin(forward);
-    while{
-        sensor
+    while(colorSensor() != blue{
+        
     }
 
 
