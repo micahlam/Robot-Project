@@ -1,7 +1,5 @@
-// Expanded non-proprietary stub that mimics the public-facing API
-// of the VEXcode IQ2 C++ header enough for local compilation
-// and IntelliSense. This is NOT the official SDK and contains
-// simplified implementations for desktop development only.
+// Minimal, class-style stub for VEXcode IQ2 C++
+// NOT the official SDK. Enough for local compile/IntelliSense.
 
 #ifndef IQ2_CPP_H_
 #define IQ2_CPP_H_
@@ -9,92 +7,126 @@
 #include <chrono>
 #include <thread>
 #include <cstdint>
+#include <cstdarg>
+#include <cstdio>
 #include <cmath>
-#include <string>
 
 namespace vex {
 
-// Units and enums (simplified)
+/*---------------- Units / basic enums ----------------*/
 enum class velocityUnits { pct, rpm };
 enum class rotationUnits { deg, rev };
 enum class directionType { fwd = 1, rev = -1 };
+enum class brakeType     { coast, brake, hold };
+enum class distanceUnits { mm, cm, in_ };
+enum class timeUnits     { msec, sec };
 
-// Backwards-compatible legacy types/values used by older VEX examples
-enum direction_t { forward = 1, reverse = -1 };
-enum unit_t { degrees = 0, percent = 1 };
+/* plain identifiers used in class code */
+inline constexpr velocityUnits pct  = velocityUnits::pct;
+inline constexpr rotationUnits  deg  = rotationUnits::deg;
+inline constexpr distanceUnits   mm  = distanceUnits::mm;
+inline constexpr timeUnits      msec = timeUnits::msec;
+inline constexpr directionType   fwd = directionType::fwd;
+inline constexpr brakeType     brake = brakeType::brake;
 
-// Port constants
-constexpr int PORT1 = 1; constexpr int PORT2 = 2; constexpr int PORT3 = 3; constexpr int PORT4 = 4;
-constexpr int PORT5 = 5; constexpr int PORT6 = 6; constexpr int PORT7 = 7; constexpr int PORT8 = 8;
-constexpr int PORT9 = 9; constexpr int PORT10 = 10;
+/*---------------- Ports ----------------*/
+constexpr int PORT1=1, PORT2=2, PORT3=3, PORT4=4, PORT5=5;
+constexpr int PORT6=6, PORT7=7, PORT8=8, PORT9=9, PORT10=10;
 
-// Simple Brain + Screen stub
+/*---------------- Colors ----------------*/
+class color {
+  int _v;
+public:
+  explicit color(int v = 0) : _v(v) {}
+  static const color black;
+  static const color white;
+};
+inline const color color::black = color(1);
+inline const color color::white = color(0);
+
+/*---------------- Button type (GLOBAL) ----------------*/
+enum class buttonType { A, B };
+
+/*---------------- Brain + Screen ----------------*/
 class brain {
 public:
   class screenType {
+    int _row{1}, _col{1};
   public:
-    void printAt(int /*x*/, int /*y*/, const char * /*fmt*/) {}
+    void clearScreen() {}
+    void setCursor(int r, int c) { _row = r; _col = c; }
+    void print(const char* fmt, ...) {
+      (void)_row; (void)_col; // no-op positioning
+      va_list args; va_start(args, fmt);
+      std::vprintf(fmt, args); std::printf("\n");
+      va_end(args);
+    }
+    void printAt(int /*x*/, int /*y*/, const char* fmt, ...) {
+      va_list args; va_start(args, fmt);
+      std::vprintf(fmt, args); std::printf("\n");
+      va_end(args);
+    }
+    // filled rectangle
+    void drawRectangle(int /*x*/, int /*y*/, int /*w*/, int /*h*/, const color& /*fill*/) {}
+    // outline variant (6 args if you ever need it)
+    void drawRectangle(int /*x*/, int /*y*/, int /*w*/, int /*h*/, const color& /*outline*/, bool /*outlineOnly*/) {}
   } Screen;
 
-  brain() = default;
+  // simple check; always false in stub (replace if you simulate)
+  bool buttonCheck(buttonType /*b*/) { return false; }
 };
 
-// Button/controller stubs
-class button {
-public:
-  button() = default;
-  bool pressing() const { return false; }
-};
-
-class controller {
-public:
-  controller() = default;
-  // named buttons used in example projects
-  button ButtonLUp;
-  button ButtonLDown;
-  button ButtonRUp;
-  button ButtonRDown;
-};
-
-// Very small motor class sufficient for project usage
+/*---------------- Motor ----------------*/
 class motor {
-  int _port;
-  bool _reversed;
-  double _position = 0.0; // stored in degrees for this stub
-  double _velocity = 0.0; // percent
+  int    _port{0};
+  bool   _rev{false};
+  double _posDeg{0.0};
+  double _velPct{0.0};
 public:
-  motor(int port = 0, bool reversed = false) : _port(port), _reversed(reversed) {}
+  motor(int port = 0, bool reversed = false) : _port(port), _rev(reversed) {}
+  void resetRotation() { _posDeg = 0.0; }
 
-  // Position/rotation helpers
-  void setPosition(double pos, rotationUnits /*u*/) { _position = pos; }
-  double position(rotationUnits /*u*/) const { return _position; }
-  // Legacy overload using `unit_t` from older code
-  void setPosition(double pos, unit_t /*u*/) { _position = pos; }
-  double position(unit_t /*u*/) const { return _position; }
-
-  // Basic spin API (overloads)
   void spin(directionType /*dir*/) {}
-  void spin(directionType /*dir*/, double speed, velocityUnits /*u*/) { _velocity = speed; }
-  // Legacy overloads accepting older `direction_t` and `unit_t` types
-  void spin(direction_t dir) { spin(static_cast<directionType>(dir)); }
-  void spin(direction_t dir, double speed, unit_t /*u*/) { spin(static_cast<directionType>(dir), speed, velocityUnits::pct); }
+  void spin(directionType /*dir*/, double speed, velocityUnits /*u*/) { _velPct = speed; }
 
-  void spinToPosition(double pos, rotationUnits /*u*/) { _position = pos; }
-  void spinToPosition(double pos, rotationUnits /*u*/, bool /*wait*/) { _position = pos; }
-  // Legacy overload
-  void spinToPosition(double pos, unit_t /*u*/) { _position = pos; }
+  void spinToPosition(double pos, rotationUnits /*u*/) { _posDeg = pos; }
+  void spinToPosition(double pos, rotationUnits /*u*/, double /*vel*/, velocityUnits /*vu*/, bool /*wait*/ = true) { _posDeg = pos; }
 
-  void spinFor(double amount, rotationUnits /*u*/) { _position += amount; }
-  // Legacy overload
-  void spinFor(double amount, unit_t /*u*/) { _position += amount; }
-  void stop() { _velocity = 0.0; }
+  void spinFor(double amount, rotationUnits /*u*/) { _posDeg += amount; }
+
+  void stop(brakeType /*b*/ = brakeType::brake) { _velPct = 0.0; }
 };
 
-// Lightweight thread helpers similar to vex::this_thread
+/*---------------- Optical ----------------*/
+class optical {
+  int _port{0};
+  bool _lightOn{false};
+  double _hue{120.0};
+public:
+  optical(int port = 0) : _port(port) {}
+  void setLight(bool on) { _lightOn = on; }
+  void setLightPower(double /*power*/, velocityUnits /*u*/ = velocityUnits::pct) { _lightOn = true; }
+  double hue() const { return _hue; }          // stubbed; edit if you simulate
+  double brightness() const { return 50.0; }
+};
+
+/*---------------- Distance ----------------*/
+class distance {
+  int _port{0};
+public:
+  distance(int port = 0) : _port(port) {}
+  int objectDistance(distanceUnits /*u*/) const { return 100; } // mm in stub
+};
+
+/*---------------- Timing ----------------*/
+inline void wait(int t, timeUnits u) {
+  using namespace std::chrono;
+  if (u == timeUnits::msec) std::this_thread::sleep_for(milliseconds(t));
+  else                      std::this_thread::sleep_for(seconds(t));
+}
+
 namespace this_thread {
-  inline void sleep_for(int ms) {
-    std::this_thread::sleep_for(std::chrono::milliseconds(ms));
-  }
+  inline void sleep_for(int ms) { vex::wait(ms, timeUnits::msec); }
 }
 
 } // namespace vex
